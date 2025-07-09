@@ -58,15 +58,9 @@ async function createProfile(config) {
     return await createProfile(config);
   }
 
-  // Ask for company country for tax classification
-  const companyCountry = await askQuestion(
-    "🏢 Enter your company country (e.g. DE, AT, US): "
-  );
-
   const profile = {
     name: profileName,
     secretKey: secretKey,
-    companyCountry: companyCountry.toUpperCase(),
     createdAt: new Date().toISOString(),
   };
 
@@ -108,18 +102,6 @@ async function selectProfile() {
   if (selectionNum >= 1 && selectionNum <= profiles.length) {
     const selectedProfile = profiles[selectionNum - 1];
     const profile = config.profiles[selectedProfile];
-
-    // Check if profile has companyCountry, if not, ask for it
-    if (!profile.companyCountry) {
-      console.log(
-        `⚠️  Profile "${selectedProfile}" doesn't have a company country set.`
-      );
-      const companyCountry = await askQuestion(
-        "🏢 Enter your company country (e.g. DE, AT, US): "
-      );
-      profile.companyCountry = companyCountry.toUpperCase();
-      await saveConfig(config);
-    }
 
     console.log(`✅ Selected profile: ${selectedProfile}`);
     return profile;

@@ -118,11 +118,7 @@ async function main() {
     ) {
       console.log("\n📊 Generating CSV files for accounting...");
       try {
-        await generateAccountingCSV(
-          stripeInvoices,
-          folderPath,
-          profile.companyCountry || "Unknown"
-        );
+        await generateAccountingCSV(stripeInvoices, folderPath);
       } catch (error) {
         console.error(
           "⚠️  Warning: Could not generate CSV files:",

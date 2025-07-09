@@ -16,9 +16,6 @@ function initializeStripe(profile) {
       apiVersion: "2024-12-18.acacia",
     });
     console.log(`🔌 Connected to Stripe with profile: ${profile.name}`);
-    if (profile.companyCountry) {
-      console.log(`🏢 Company country: ${profile.companyCountry}`);
-    }
     return true;
   } catch (error) {
     console.error("❌ Error initializing Stripe:", error);
@@ -79,7 +76,14 @@ async function getStripeInvoices(month, year) {
         lte: endTimestamp,
       },
       limit: 100,
-      expand: ["data.customer", "data.lines", "data.lines.data.tax_rates"],
+      expand: [
+        "data.customer",
+        "data.customer.address",
+        "data.lines",
+        "data.lines.data.tax_rates",
+        "data.total_tax_amounts",
+        "data.total_tax_amounts.tax_rate",
+      ],
     };
 
     if (startingAfter) {
@@ -113,7 +117,12 @@ async function getStripeInvoices(month, year) {
 async function downloadStripeInvoice(invoice, folderPath) {
   try {
     const customer = invoice.customer;
-    const customerName = customer?.name || customer?.email || "Unknown";
+    const customerName =
+      customer?.name ||
+      invoice.customer_name ||
+      customer?.email ||
+      invoice.customer_email ||
+      "Unknown";
     const invoiceNumber = invoice.number || invoice.id;
     // Use amount_paid if available, otherwise use total amount
     const amount = ((invoice.amount_paid || invoice.total) / 100).toFixed(2);
@@ -161,7 +170,12 @@ function displayInvoiceDetails(invoices) {
 
   invoices.forEach((invoice, index) => {
     const customer = invoice.customer;
-    const customerName = customer?.name || customer?.email || "Unknown";
+    const customerName =
+      customer?.name ||
+      invoice.customer_name ||
+      customer?.email ||
+      invoice.customer_email ||
+      "Unknown";
     // Use amount_paid if available, otherwise use total amount
     const amount = (invoice.amount_paid || invoice.total) / 100;
     const currency = invoice.currency.toUpperCase();

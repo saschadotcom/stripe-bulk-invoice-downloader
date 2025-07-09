@@ -6,19 +6,40 @@ const { classifyTax, extractTaxInfo } = require("../tax/classifier");
  * Generate CSV files for accounting purposes
  * @param {Array} invoices - Array of Stripe invoices
  * @param {string} folderPath - Output folder path
- * @param {string} companyCountry - Company's country code
  * @returns {Promise<object>} Paths to generated CSV files
  */
-async function generateAccountingCSV(invoices, folderPath, companyCountry) {
+async function generateAccountingCSV(invoices, folderPath) {
   try {
     const csvData = [];
     const countrySummary = {};
 
+    // Extract company country from first invoice
+    const companyCountry =
+      invoices.length > 0 ? invoices[0].account_country : "Unknown";
+
+    if (companyCountry && companyCountry !== "Unknown") {
+      console.log(`🏢 Detected company country: ${companyCountry}`);
+    } else {
+      console.log(
+        "⚠️  Warning: Could not detect company country from invoices"
+      );
+    }
+
     // Process each invoice
     for (const invoice of invoices) {
       const customer = invoice.customer;
-      const customerName = customer?.name || customer?.email || "Unknown";
-      const customerCountry = customer?.address?.country || "Unknown";
+      const customerName =
+        customer?.name ||
+        invoice.customer_name ||
+        customer?.email ||
+        invoice.customer_email ||
+        "Unknown";
+
+      // Try multiple sources for customer country - prioritize invoice address (historical)
+      const customerCountry =
+        invoice.customer_address?.country || // Direct invoice field (historical, correct!)
+        customer?.address?.country || // Expanded customer object (current, fallback)
+        "Unknown";
       const invoiceNumber = invoice.number || invoice.id;
       const currency = invoice.currency.toUpperCase();
       const date = new Date(invoice.created * 1000).toLocaleDateString("de-DE");
@@ -28,7 +49,23 @@ async function generateAccountingCSV(invoices, folderPath, companyCountry) {
 
       // Extract tax information
       const taxRateInfo = extractTaxInfo(invoice);
+      taxRateInfo.invoiceId = invoiceNumber; // Add for debug logging
       const taxAmount = taxRateInfo.amount;
+
+      // Debug: Log wenn Daten fehlen
+      if (customerCountry === "Unknown") {
+        console.log(
+          `⚠️  Debug: Invoice ${invoiceNumber} - Customer country unknown! Customer ID: ${
+            customer?.id || "N/A"
+          }`
+        );
+      }
+      // Only log if it's an unexpected case (has tax but no rate)
+      if (!taxRateInfo.rate && taxAmount > 0) {
+        console.log(
+          `⚠️  Debug: Invoice ${invoiceNumber} - No tax rate found for non-zero tax amount. Using fallback logic.`
+        );
+      }
 
       // Calculate net amount
       const netAmount = totalAmount - taxAmount;

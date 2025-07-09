@@ -7,8 +7,9 @@ A Node.js command-line tool to download paid Stripe invoices for a specific mont
 - 📅 Download invoices for any specific month and year
 - 🔐 Multi-profile support for managing multiple Stripe accounts
 - 🛡️ Secure API key handling (keys are masked during input)
+- 🏢 **Automatic company country detection** from Stripe account data
 - 📊 Invoice summary with totals by currency
-- 📁 Automatic folder creation with organized naming (`invoices_YYYY_MM`)
+- 📁 Automatic folder creation with organized naming (`downloads/YYYY/MM/`)
 - 💾 Configuration persistence (profiles are saved for future use)
 - 🎯 Only downloads paid invoices
 - 📋 Detailed invoice information display before download
@@ -58,8 +59,8 @@ When you run the script for the first time, you'll be prompted to create a profi
 
    - Enter a profile name (e.g., "My Business", "Client A")
    - Enter your Stripe Secret Key (starts with `sk_`)
-   - Enter your company country (e.g., DE, AT, US) for correct tax classification
    - The key will be masked during input for security
+   - Company country is automatically detected from your Stripe account
 
 2. **Download Process:**
    - Select the month (1-12)
@@ -118,6 +119,7 @@ If you have multiple Stripe accounts, you can create multiple profiles:
 ✅ Downloaded: INV-003_Company_Ltd_299.99USD.pdf
 
 📊 Generating CSV files for accounting...
+🏢 Detected company country: DE
 📊 CSV files created:
    📄 Detailed: /path/to/downloads/2024/12/invoices_detailed.csv
    📋 Summary: /path/to/downloads/2024/12/invoices_summary.csv
@@ -310,18 +312,18 @@ The script creates a `config.json` file to store your profiles:
     "My Business Account": {
       "name": "My Business Account",
       "secretKey": "sk_live_...",
-      "companyCountry": "DE",
       "createdAt": "2024-12-18T10:30:00.000Z"
     },
     "Client Project A": {
       "name": "Client Project A",
       "secretKey": "sk_test_...",
-      "companyCountry": "US",
       "createdAt": "2024-12-18T11:00:00.000Z"
     }
   }
 }
 ```
+
+**Note:** Company country is now automatically detected from your Stripe account data and no longer stored in the profile. Existing profiles with manually entered company countries will continue to work, but the automatic detection takes precedence.
 
 ⚠️ **Important:** This file contains sensitive API keys. Make sure it's added to your `.gitignore` file.
 
