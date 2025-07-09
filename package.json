@@ -1,0 +1,33 @@
+{
+  "name": "stripe-invoice-downloader",
+  "version": "1.0.0",
+  "description": "A Node.js script to download paid Stripe invoices for a specific month and year with multi-profile support",
+  "main": "index.js",
+  "bin": {
+    "stripe-invoice-downloader": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "stripe",
+    "invoice",
+    "downloader",
+    "pdf",
+    "billing",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "stripe": "^18.3.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
