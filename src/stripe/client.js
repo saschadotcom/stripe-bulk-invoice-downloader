@@ -24,15 +24,20 @@ function initializeStripe(profile) {
 }
 
 /**
- * Create download folder with new structure: downloads/YYYY/MM/
+ * Create download folder with new structure: downloads/ProfileName/YYYY/MM/
+ * @param {string} profileName - Profile name for folder organization
  * @param {number} month - Month number
  * @param {number} year - Year number
  * @returns {Promise<string>} Folder path
  */
-async function createDownloadFolder(month, year) {
+async function createDownloadFolder(profileName, month, year) {
+  // Create safe profile name for folder
+  const safeProfileName = profileName.replace(/[^a-zA-Z0-9_\-]/g, "_");
+
   const folderPath = path.join(
     process.cwd(),
     "downloads",
+    safeProfileName,
     year.toString(),
     formatMonth(month)
   );

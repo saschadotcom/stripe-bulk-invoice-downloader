@@ -66,8 +66,8 @@ async function main() {
       )}/${year}...\n`
     );
 
-    // Create download folder with new structure
-    const folderPath = await createDownloadFolder(month, year);
+    // Create download folder with profile-specific structure
+    const folderPath = await createDownloadFolder(profile.name, month, year);
 
     // Fetch invoices
     const stripeInvoices = await getStripeInvoices(month, year);
